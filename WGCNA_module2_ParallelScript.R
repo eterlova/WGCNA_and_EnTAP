@@ -96,8 +96,9 @@ dev.off()
 ### Step XX: Make Module eigengenes
 MEList = moduleEigengenes(datExpr0, colors = dynamicColors)                               # Compute module eigengenes -- MEs are generalizations 
 MEs = MEList$eigengenes                                                                   #   of the expression profile of all the genes in a module.
-MEDiss = 1-cor(MEs);                                                                      # Let's make a distance matrix of the MEs' correlation with each other
-METree = hclust(as.dist(MEDiss), method = "average");                                     # Make a dendrogram of the module eigengenes (to see if we can merge similar modules)
+MEDiss = 1-cor(MEs)                                                                      # Let's make a distance matrix of the MEs' correlation with each other
+MEDiss = ifelse(is.na(MEDiss), 0, MEDiss)                                                 # You need this because there are likely NA values in your MEs and hclust does not like that
+METree = hclust(as.dist(MEDiss), method = "average")                                     # Make a dendrogram of the module eigengenes (to see if we can merge similar modules)
 png(paste(basename, "ME_tree", "WithCutHeight.png", sep="_"))
 plot(METree, main = "Clustering of module eigengenes",
      xlab = "", sub = "")
@@ -106,8 +107,8 @@ MEDissThres = 0.25                                                              
 abline(h=MEDissThres, col = "red")                                                        # This cut-line shows which modules are going to get merged. 
 dev.off()
 merge = mergeCloseModules(datExpr0, dynamicColors, cutHeight = MEDissThres, verbose = 3)  # Now let's merge the close modules. 
-mergedColors = merge$colors;                                                              # Get the remaining colors
-mergedMEs = merge$newMEs;                                                                 # And get the remaining MEs
+mergedColors = merge$colors                                                              # Get the remaining colors
+mergedMEs = merge$newMEs                                                                 # And get the remaining MEs
 
 png(paste(basename, "Merged_Modules.png", sep="_"))                                       # Let's show what these merged modules look like 
 #Convert labels to colors for plotting
